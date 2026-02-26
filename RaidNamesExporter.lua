@@ -5,13 +5,13 @@ RaidMembersData = RaidMembersData or {}
 RaidTrackerMinimapButtonDB = RaidTrackerMinimapButtonDB or {}
 local nextId = 1
 
--- Ottieni ora corrente in formato HH:MM
+-- Get current time in HH:MM format
 local function GetCurrentTime()
     return date("%H:%M")
 end
 
 -- ==========================
--- Finestra principale
+-- Main window
 -- ==========================
 local frame = CreateFrame("Frame", "RaidTrackerFrame", UIParent)
 frame:SetWidth(345)
@@ -26,7 +26,7 @@ frame:SetBackdrop({
 frame:SetBackdropColor(0, 0, 0, 0.3)
 frame:Hide()
 
--- Bottone chiudi
+-- Close button
 local close = CreateFrame("Button", "RaidTrackerCloseButton", frame, "UIPanelButtonTemplate")
 close:SetWidth(20)
 close:SetHeight(20)
@@ -36,7 +36,7 @@ close:SetScript("OnClick", function()
     frame:Hide()
 end)
 
--- Bottone Copia
+-- Copy button
 local copyBtn = CreateFrame("Button", "RaidTrackerCopyButton", frame, "UIPanelButtonTemplate")
 copyBtn:SetWidth(50)
 copyBtn:SetHeight(20)
@@ -44,7 +44,7 @@ copyBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -5)
 copyBtn:SetText("Copy")
 
 -- ==========================
--- ScrollFrame contenitore righe con bottoni
+-- ScrollFrame container for rows with buttons
 -- ==========================
 local scrollFrame = CreateFrame("ScrollFrame", "RaidTrackerScrollFrame", frame, "UIPanelScrollFrameTemplate")
 scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -30)
@@ -52,22 +52,22 @@ scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 10)
 
 local content = CreateFrame("Frame", "RaidTrackerContent", scrollFrame)
 content:SetWidth(360)
-content:SetHeight(1) -- sarà ridimensionato dinamicamente
+content:SetHeight(1) -- will be resized dynamically
 scrollFrame:SetScrollChild(content)
 
--- Abilita rotellina e handler robusto compatibile TWOW 1.12
-local invertMouseWheel = false  -- metti true se vuoi invertire la direzione
+-- Enable mouse wheel and robust handler compatible with TWOW 1.12
+local invertMouseWheel = false  -- set to true if you want to invert the direction
 
 scrollFrame:EnableMouseWheel(true)
 scrollFrame:SetScript("OnMouseWheel", function()
-    -- In 1.12 il delta è in arg1 (variabile globale)
+    -- In 1.12 the delta is in arg1 (global variable)
     local delta = arg1
-    if not delta then return end  -- nessun valore, esci
+    if not delta then return end  -- no value, exit
 
     local cur = scrollFrame:GetVerticalScroll() or 0
     local max = scrollFrame:GetVerticalScrollRange() or 0
     local step = 20
-    local new  = cur - delta * step   -- usa + se vuoi invertire
+    local new  = cur - delta * step   -- use + if you want to invert
 
     if new < 0 then new = 0 end
     if new > max then new = max end
@@ -78,17 +78,17 @@ end)
 
 
 -- ==========================
--- Funzione refresh UI
+-- UI refresh function
 -- ==========================
 local function RefreshRaidUI()
-    -- Pulisci righe precedenti
+    -- Clean up previous rows
     local children = {content:GetChildren()}
     for _, child in ipairs(children) do
         child:Hide()
         child:SetParent(nil)
     end
 
-    -- Crea lista ordinata dei nomi
+    -- Create sorted list of names
     local names = {}
     for name, _ in pairs(RaidMembersData) do
         table.insert(names, name)
@@ -99,7 +99,7 @@ local function RefreshRaidUI()
     local totalHeight = 0
 
     for _, name in ipairs(names) do
-        local memberName = name                            -- copia locale per le closure
+        local memberName = name                            -- local copy for closures
         local data = RaidMembersData[memberName] or {}
 
         local row = CreateFrame("Frame", nil, content)
@@ -107,21 +107,21 @@ local function RefreshRaidUI()
         row:SetHeight(20)
         row:SetPoint("TOPLEFT", content, "TOPLEFT", 0, yOffset)
 
-        -- valori di sicurezza per evitare nil
+        -- safety values to avoid nil
         local safeName  = tostring(data.name or memberName)
         local safeClass = tostring(data.class or "-")
         local safePts   = tonumber(data.points) or 0
 
         local text = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         text:SetPoint("LEFT", row, "LEFT", 0, 0)
-        text:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")  -- <== font più grande (14) con bordo sottile
+        text:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")  -- <== larger font (14) with thin border
         local ok, sText = pcall(string.format, "%s (%s) - Points: %d", safeName, safeClass, safePts)
         if not ok or not sText then
             sText = tostring(safeName) .. " (" .. tostring(safeClass) .. ") - Points: " .. tostring(safePts)
         end
         text:SetText(sText)
 
-        -- Bottone +
+        -- Plus button
         local plus = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
         plus:SetWidth(20) plus:SetHeight(20)
         plus:SetPoint("RIGHT", row, "RIGHT", -95, 0)
@@ -143,7 +143,7 @@ local function RefreshRaidUI()
             RefreshRaidUI()
         end)
 
-        -- Bottone -
+        -- Minus button
         local minus = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
         minus:SetWidth(20) minus:SetHeight(20)
         minus:SetPoint("RIGHT", row, "RIGHT", -75, 0)
@@ -165,7 +165,7 @@ local function RefreshRaidUI()
             RefreshRaidUI()
         end)
 
-        -- Bottone "x" (+3 punti)
+        -- "x" button (+3 points)
         local reset = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
         reset:SetWidth(20) reset:SetHeight(20)
         reset:SetPoint("RIGHT", row, "RIGHT", -55, 0)
@@ -196,21 +196,22 @@ local function RefreshRaidUI()
     content:SetHeight(totalHeight)
 end
 
--- Bottone "Reset"
+-- "Reset" button
 local resetBtn = CreateFrame("Button", "RaidTrackerResetButton", frame, "UIPanelButtonTemplate")
 resetBtn:SetWidth(60)
 resetBtn:SetHeight(20)
-resetBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 70, -5) -- accanto al bottone Copia
+resetBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 70, -5) -- next to the Copy button
 resetBtn:SetText("Reset")
 resetBtn:SetScript("OnClick", function()
-    -- Finestra di conferma per sicurezza
+    -- Confirmation window for safety
     StaticPopupDialogs["RAIDTRACKER_RESET_CONFIRM"] = {
-        text = "Vuoi davvero azzerare la lista?",
-        button1 = "Si",
+        text = "Do you really want to reset the list?",
+        button1 = "Yes",
         button2 = "No",
         OnAccept = function()
             RaidMembersData = {}
             nextId = 1
+            UpdateRaidMembers()
             RefreshRaidUI()
         end,
         timeout = 0,
@@ -222,7 +223,7 @@ end)
 
 local copyFrame, copyEditBox
 
--- Bottone " Boss Debuffs "
+-- "Boss Debuffs" button
 
 local buffBtn = CreateFrame("Button", "RaidTrackerBuffButton", frame, "UIPanelButtonTemplate")
 buffBtn:SetWidth(60)
@@ -231,6 +232,17 @@ buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 140, -5)
 buffBtn:SetText("BuffCheck")
 buffBtn:SetScript("OnClick", function()
     RunBuffCheck()
+end)
+
+-- Button " Reload Names "
+
+local buffBtn = CreateFrame("Button", "RaidTrackerBuffButton", frame, "UIPanelButtonTemplate")
+buffBtn:SetWidth(120)
+buffBtn:SetHeight(20)
+buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 225, -5)
+buffBtn:SetText("Reload Names")
+buffBtn:SetScript("OnClick", function()
+    RefreshRaidUI()
 end)
 
 -- ==============
@@ -260,26 +272,26 @@ local function ShowCopyWindow()
         close:SetText("X")
         close:SetScript("OnClick", function() copyFrame:Hide() end)
 
-        -- ScrollFrame con barra laterale
+        -- ScrollFrame with sidebar
         local scroll = CreateFrame("ScrollFrame", "RaidTrackerCopyScroll", copyFrame, "UIPanelScrollFrameTemplate")
         scroll:SetPoint("TOPLEFT", copyFrame, "TOPLEFT", 10, -30)
         scroll:SetPoint("BOTTOMRIGHT", copyFrame, "BOTTOMRIGHT", -30, 10)
 
-        -- EditBox più alto del frame così il contenuto è scrollabile
+        -- EditBox taller than the frame so content is scrollable
         copyEditBox = CreateFrame("EditBox", nil, scroll)
         copyEditBox:SetMultiLine(true)
         copyEditBox:SetWidth(310)
-        copyEditBox:SetHeight(1000)             -- <<< altezza grande, importante
+        copyEditBox:SetHeight(1000)             -- <<< large height, important
         copyEditBox:SetAutoFocus(false)
         copyEditBox:SetFont("Fonts\\ARIALN.TTF", 12)
         copyEditBox:EnableMouse(true)
         copyEditBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
         scroll:SetScrollChild(copyEditBox)
 
-        -- Rotellina mouse (come per la finestra principale)
+        -- Mouse wheel (like for the main window)
         scroll:EnableMouseWheel(true)
         scroll:SetScript("OnMouseWheel", function()
-            local delta = arg1        -- WoW 1.12 passa il delta in arg1
+            local delta = arg1        -- WoW 1.12 passes the delta in arg1
             if not delta then return end
             local cur = scroll:GetVerticalScroll() or 0
             local max = scroll:GetVerticalScrollRange() or 0
@@ -291,20 +303,20 @@ local function ShowCopyWindow()
         end)
     end
 
-    -- raccogli e ordina i nomi
+    -- collect and sort names
     local names = {}
     for name in pairs(RaidMembersData) do table.insert(names, name) end
     table.sort(names)
 
-    -- Se non ci sono membri, mostra messaggio
+    -- If there are no members, show message
     if next(names) == nil then
-        copyEditBox:SetText("Nessun membro nel DB di RaidTracker.")
+        copyEditBox:SetText("No members in the RaidTracker DB.")
         copyEditBox:HighlightText()
         copyFrame:Show()
         return
     end
 
-    -- Trova lunghezza massima di "Nome (Classe)"
+    -- Find maximum length of "Name (Class)"
     local maxLabelLen = 0
     for _, name in ipairs(names) do
         local data = RaidMembersData[name] or {}
@@ -313,11 +325,11 @@ local function ShowCopyWindow()
         if labelLen > maxLabelLen then maxLabelLen = labelLen end
     end
 
-    -- Costruisci formato dinamico: riserva spazio sufficiente per tutte le etichette
-    local labelFieldWidth = maxLabelLen + 2 -- +2 spazi di separazione
+    -- Build dynamic format: reserve enough space for all labels
+    local labelFieldWidth = maxLabelLen + 2 -- +2 separation spaces
     local fmt = "[%02d] %-" .. tostring(labelFieldWidth) .. "s In:%-6s Out:%-6s Pts:%-3d"
 
-    -- Crea le righe in modo completamente sicuro
+    -- Create rows in a completely safe way
     local lines = {}
     for _, name in ipairs(names) do
         local d = RaidMembersData[name] or {}
@@ -328,7 +340,7 @@ local function ShowCopyWindow()
         local leaveStr = tostring(d.leaveTime or "-")
         local pts      = tonumber(d.points)   or 0
 
-        -- pcall per intercettare eventuali errori di format
+        -- pcall to intercept any format errors
         local ok, line = pcall(string.format, fmt, id, label, joinStr, leaveStr, pts)
         if not ok then
             line = string.format("[%02d] %s In:%s Out:%s Pts:%d",
@@ -352,9 +364,9 @@ copyBtn:SetScript("OnClick", ShowCopyWindow)
 
 
 -- ==========================
--- Aggiorna dati raid
+-- Update raid data
 -- ==========================
-local function UpdateRaidMembers()
+function UpdateRaidMembers()
     local currentRaid = {}
     local num = GetNumRaidMembers() or 0
 
@@ -378,7 +390,7 @@ local function UpdateRaidMembers()
         end
     end
 
-    -- Segna chi è uscito
+    -- Mark who left
     for name, data in pairs(RaidMembersData) do
         if data.leaveTime == "" and not currentRaid[name] then
             data.leaveTime = GetCurrentTime()
@@ -389,14 +401,14 @@ local function UpdateRaidMembers()
 end
 
 -- ==========================
--- Evento RAID_ROSTER_UPDATE
+-- RAID_ROSTER_UPDATE event
 -- ==========================
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("RAID_ROSTER_UPDATE")
 eventFrame:SetScript("OnEvent", UpdateRaidMembers)
 
 -- ==========================
--- Popup reset e ricarica raid (compatibile Turtle WoW 1.12)
+-- Reset popup and reload raid (compatible with Turtle WoW 1.12)
 -- ==========================
 local resetFrame = CreateFrame("Frame")
 resetFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -411,13 +423,13 @@ resetFrame:SetScript("OnEvent", function()
     if inRaid and not wasInRaid then
         StaticPopupDialogs["RAIDTRACKER_RESET_CONFIRM"] = {
             text = "You'have joined a new raid. Do you want to reset the previous data and load the new list?",
-            button1 = "Si",
+            button1 = "Yes",
             button2 = "No",
             OnAccept = function()
-                -- 1. Svuota dati precedenti
+                -- 1. Clear previous data
                 RaidMembersData = {}
                 nextId = 1
-                -- 2. Popola subito con i membri del raid attuale
+                -- 2. Populate immediately with current raid members
                 UpdateRaidMembers()
                 RefreshRaidUI()
             end,
@@ -446,7 +458,7 @@ SlashCmdList["RAIDTRACKER"] = function()
 end
 
 -- ==========================
--- Pulsante minimappa
+-- Minimap button
 -- ==========================
 local minimapButton = CreateFrame("Button", "RaidTrackerMinimapButton", Minimap)
 minimapButton:SetWidth(23)
@@ -476,7 +488,7 @@ end)
 
 minimapButton:SetScript("OnEnter", function()
     GameTooltip:SetOwner(minimapButton, "ANCHOR_LEFT")
-    GameTooltip:SetText("Raid Tracker\nClicca per aprire")
+    GameTooltip:SetText("Raid Tracker\nClick to open")
     GameTooltip:Show()
 end)
 minimapButton:SetScript("OnLeave", function()
@@ -517,7 +529,7 @@ function RunBuffCheck()
         ["Curse of Recklessness"] = {found = false},
     }
 
-    -- Debuff 1–16 tramite UnitDebuff
+    -- Debuff 1–16 through UnitDebuff
     for i = 1, 16 do
         local debuffName, _, count = UnitDebuff("target", i)
         if not debuffName then break end
@@ -528,7 +540,7 @@ function RunBuffCheck()
         end
     end
 
-    -- Debuff 17–48 trasformati in buff
+    -- Debuff 17–48 transformed to buff
     for i = 1, 32 do
         local buffName, _, count = UnitBuff("target", i)
         if not buffName then break end
@@ -539,7 +551,7 @@ function RunBuffCheck()
         end
     end
 
-    -- Output in una sola linea
+    -- Output in a single line
     local msg = string.format(
         "Sunder %d/%d FF:%s E:%s S:%s R:%s",
         debuffs["Sunder Armor"].count,
@@ -553,7 +565,7 @@ function RunBuffCheck()
 
 end
 
--- Se vuoi tenere anche la slash command /buff:
+-- If you want to keep the /buff slash command too:
 SLASH_RAIDBUFFCHECK1 = "/buff"
 SlashCmdList["RAIDBUFFCHECK"] = RunBuffCheck
 
