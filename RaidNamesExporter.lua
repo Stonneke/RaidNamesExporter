@@ -14,7 +14,7 @@ end
 -- Main window
 -- ==========================
 local frame = CreateFrame("Frame", "RaidTrackerFrame", UIParent)
-frame:SetWidth(400)
+frame:SetWidth(360)
 frame:SetHeight(700)
 frame:SetPoint("CENTER", UIParent, "CENTER", 413, 0)
 frame:SetBackdrop({
@@ -24,6 +24,15 @@ frame:SetBackdrop({
     insets = { left = 4, right = 4, top = 4, bottom = 4 }
 })
 frame:SetBackdropColor(0, 0, 0, 0.3)
+frame:EnableMouse(true)
+frame:SetMovable(true)
+frame:RegisterForDrag("LeftButton")
+frame:SetScript("OnDragStart", function()
+    frame:StartMoving()
+end)
+frame:SetScript("OnDragStop", function()
+    frame:StopMovingOrSizing()
+end)
 frame:Hide()
 
 -- Close button
