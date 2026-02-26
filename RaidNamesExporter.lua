@@ -14,7 +14,7 @@ end
 -- Main window
 -- ==========================
 local frame = CreateFrame("Frame", "RaidTrackerFrame", UIParent)
-frame:SetWidth(365)
+frame:SetWidth(400)
 frame:SetHeight(700)
 frame:SetPoint("CENTER", UIParent, "CENTER", 413, 0)
 frame:SetBackdrop({
