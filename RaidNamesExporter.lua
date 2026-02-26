@@ -223,23 +223,12 @@ end)
 
 local copyFrame, copyEditBox
 
--- "Boss Debuffs" button
-
-local buffBtn = CreateFrame("Button", "RaidTrackerBuffButton", frame, "UIPanelButtonTemplate")
-buffBtn:SetWidth(80)
-buffBtn:SetHeight(20)
-buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 135, -5)
-buffBtn:SetText("BuffCheck")
-buffBtn:SetScript("OnClick", function()
-    RunBuffCheck()
-end)
-
 -- Button " Reload Names "
 
 local buffBtn = CreateFrame("Button", "RaidTrackerBuffButton", frame, "UIPanelButtonTemplate")
 buffBtn:SetWidth(115)
 buffBtn:SetHeight(20)
-buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 220, -5)
+buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 135, -5)
 buffBtn:SetText("Reload Names")
 buffBtn:SetScript("OnClick", function()
     RefreshRaidUI()
