@@ -14,7 +14,7 @@ end
 -- Main window
 -- ==========================
 local frame = CreateFrame("Frame", "RaidTrackerFrame", UIParent)
-frame:SetWidth(345)
+frame:SetWidth(365)
 frame:SetHeight(700)
 frame:SetPoint("CENTER", UIParent, "CENTER", 413, 0)
 frame:SetBackdrop({
@@ -228,7 +228,7 @@ local copyFrame, copyEditBox
 local buffBtn = CreateFrame("Button", "RaidTrackerBuffButton", frame, "UIPanelButtonTemplate")
 buffBtn:SetWidth(80)
 buffBtn:SetHeight(20)
-buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 140, -5)
+buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 135, -5)
 buffBtn:SetText("BuffCheck")
 buffBtn:SetScript("OnClick", function()
     RunBuffCheck()
@@ -237,9 +237,9 @@ end)
 -- Button " Reload Names "
 
 local buffBtn = CreateFrame("Button", "RaidTrackerBuffButton", frame, "UIPanelButtonTemplate")
-buffBtn:SetWidth(120)
+buffBtn:SetWidth(115)
 buffBtn:SetHeight(20)
-buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 215, -5)
+buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 220, -5)
 buffBtn:SetText("Reload Names")
 buffBtn:SetScript("OnClick", function()
     RefreshRaidUI()
