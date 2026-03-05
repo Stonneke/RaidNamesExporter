@@ -1,8 +1,8 @@
 ## Interface: 11200
-## Title: Raid Names Exporter
+## Title: Raid Names Exporter_DEV
 ## Notes: Export raid player names in a copyable window.
-## Author: ChatGPT
-## Version: 1.2
+## Author: LF Tent
+## Version: 1.3
 ## SavedVariables: RaidMembersData, RaidTrackerMinimapButtonDB
 
-RaidNamesExporter.lua
+RaidNamesExporter_DEV.lua
