@@ -4,6 +4,18 @@
 RaidMembersData = RaidMembersData or {}
 RaidTrackerMinimapButtonDB = RaidTrackerMinimapButtonDB or {}
 local nextId = 1
+local LFDKP_ADDON_PREFIX = "LFDKP"
+local syncEnabled = false
+
+local function SendLFDKPSync(name, delta)
+    if not syncEnabled then return end
+    if not name or name == "" then return end
+    if not delta or delta == 0 then return end
+    if not SendAddonMessage then return end
+
+    local payload = string.format("%s %+d points", tostring(name), tonumber(delta) or 0)
+    SendAddonMessage(LFDKP_ADDON_PREFIX, payload, "RAID")
+end
 
 -- Get current time in HH:MM format
 local function GetCurrentTime()
@@ -149,6 +161,7 @@ local function RefreshRaidUI()
                 nextId = nid + 1
             end
             RaidMembersData[memberName].points = (RaidMembersData[memberName].points or 0) + 1
+            SendLFDKPSync(memberName, 1)
             RefreshRaidUI()
         end)
 
@@ -171,6 +184,7 @@ local function RefreshRaidUI()
                 nextId = nid + 1
             end
             RaidMembersData[memberName].points = (RaidMembersData[memberName].points or 0) - 1
+            SendLFDKPSync(memberName, -1)
             RefreshRaidUI()
         end)
 
@@ -193,6 +207,7 @@ local function RefreshRaidUI()
                 nextId = nid + 1
             end
             RaidMembersData[memberName].points = (RaidMembersData[memberName].points or 0) + 3
+            SendLFDKPSync(memberName, 3)
             RefreshRaidUI()
         end)
 
@@ -241,6 +256,19 @@ buffBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 135, -5)
 buffBtn:SetText("Reload Names")
 buffBtn:SetScript("OnClick", function()
     RefreshRaidUI()
+end)
+
+local syncCheck = CreateFrame("CheckButton", "RaidTrackerSyncCheckButton", frame, "UICheckButtonTemplate")
+syncCheck:SetWidth(20)
+syncCheck:SetHeight(20)
+syncCheck:SetPoint("RIGHT", close, "LEFT", -10, 0)
+
+local syncText = syncCheck:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+syncText:SetPoint("RIGHT", syncCheck, "LEFT", -2, 0)
+syncText:SetText("Sync")
+
+syncCheck:SetScript("OnClick", function()
+    syncEnabled = syncCheck:GetChecked() and true or false
 end)
 
 -- ==============
