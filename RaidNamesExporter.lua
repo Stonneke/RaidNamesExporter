@@ -217,7 +217,23 @@ local function RefreshRaidUI()
 
 
 
-    content:SetHeight(totalHeight)
+    -- Keep a minimum height and include top/bottom padding used by row anchors.
+    local contentHeight = totalHeight + 8
+    if contentHeight < 1 then
+        contentHeight = 1
+    end
+    content:SetHeight(contentHeight)
+
+    -- On 1.12 clients, forcing child-rect updates avoids stale scroll ranges.
+    if scrollFrame.UpdateScrollChildRect then
+        scrollFrame:UpdateScrollChildRect()
+    end
+
+    local maxScroll = scrollFrame:GetVerticalScrollRange() or 0
+    local curScroll = scrollFrame:GetVerticalScroll() or 0
+    if curScroll > maxScroll then
+        scrollFrame:SetVerticalScroll(maxScroll)
+    end
 end
 
 -- "Reset" button
