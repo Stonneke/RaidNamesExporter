@@ -2,7 +2,7 @@
 ## Title: Raid Names Exporter
 ## Notes: Export raid player names in a copyable window.
 ## Author: LF Tent
-## Version: 1.6
-## SavedVariables: RaidMembersData, RaidTrackerMinimapButtonDB
+## Version: 1.7
+## SavedVariables: RaidMembersData, RaidTrackerMinimapButtonDB, RaidTrackerBackdropAlpha
 
 RaidNamesExporter.lua

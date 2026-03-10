@@ -3,9 +3,24 @@
 -- Saved DB
 RaidMembersData = RaidMembersData or {}
 RaidTrackerMinimapButtonDB = RaidTrackerMinimapButtonDB or {}
+RaidTrackerBackdropAlpha = RaidTrackerBackdropAlpha or 0.30
 local nextId = 1
 local LFDKP_ADDON_PREFIX = "LFDKP"
 local syncEnabled = false
+
+local function ClampBackdropAlpha(value)
+    local numericValue = tonumber(value) or 0.30
+    if numericValue < 0.05 then
+        numericValue = 0.05
+    elseif numericValue > 0.90 then
+        numericValue = 0.90
+    end
+    return numericValue
+end
+
+print("Raid Names Exporter loaded.")
+
+RaidTrackerBackdropAlpha = ClampBackdropAlpha(RaidTrackerBackdropAlpha)
 
 local function SendLFDKPSync(name, delta)
     if not syncEnabled then return end
@@ -35,7 +50,7 @@ frame:SetBackdrop({
     tile = true, tileSize = 16, edgeSize = 16,
     insets = { left = 4, right = 4, top = 4, bottom = 4 }
 })
-frame:SetBackdropColor(0, 0, 0, 0.3)
+frame:SetBackdropColor(0, 0, 0, RaidTrackerBackdropAlpha)
 frame:EnableMouse(true)
 frame:SetMovable(true)
 frame:RegisterForDrag("LeftButton")
@@ -64,11 +79,55 @@ copyBtn:SetHeight(20)
 copyBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -5)
 copyBtn:SetText("Copy")
 
+local alphaLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+alphaLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -31)
+alphaLabel:SetText("Background")
+
+local alphaSlider = CreateFrame("Slider", "RaidTrackerAlphaSlider", frame, "OptionsSliderTemplate")
+alphaSlider:SetWidth(150)
+alphaSlider:SetHeight(14)
+alphaSlider:SetPoint("LEFT", alphaLabel, "RIGHT", 8, 0)
+alphaSlider:SetMinMaxValues(0.05, 0.90)
+alphaSlider:SetValueStep(0.05)
+if getglobal("RaidTrackerAlphaSliderText") then
+    getglobal("RaidTrackerAlphaSliderText"):SetText("")
+end
+if getglobal("RaidTrackerAlphaSliderLow") then
+    getglobal("RaidTrackerAlphaSliderLow"):SetText("5%")
+end
+if getglobal("RaidTrackerAlphaSliderHigh") then
+    getglobal("RaidTrackerAlphaSliderHigh"):SetText("90%")
+end
+
+local alphaValueText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+alphaValueText:SetPoint("LEFT", alphaSlider, "RIGHT", 8, 0)
+
+local function RefreshAlphaValueText()
+    alphaValueText:SetText(tostring(math.floor(RaidTrackerBackdropAlpha * 100 + 0.5)) .. "%")
+end
+
+alphaSlider:SetScript("OnValueChanged", function(self, value)
+    if not value then
+        value = arg1
+    end
+    if not value and self and self.GetValue then
+        value = self:GetValue()
+    end
+    if value then
+        RaidTrackerBackdropAlpha = ClampBackdropAlpha(value)
+        frame:SetBackdropColor(0, 0, 0, RaidTrackerBackdropAlpha)
+        RefreshAlphaValueText()
+    end
+end)
+
+alphaSlider:SetValue(RaidTrackerBackdropAlpha)
+RefreshAlphaValueText()
+
 -- ==========================
 -- ScrollFrame container for rows with buttons
 -- ==========================
 local scrollFrame = CreateFrame("ScrollFrame", "RaidTrackerScrollFrame", frame, "UIPanelScrollFrameTemplate")
-scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -30)
+scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -72)
 scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 10)
 
 local content = CreateFrame("Frame", "RaidTrackerContent", scrollFrame)
@@ -610,4 +669,3 @@ end
 -- If you want to keep the /buff slash command too:
 SLASH_RAIDBUFFCHECK1 = "/buff"
 SlashCmdList["RAIDBUFFCHECK"] = RunBuffCheck
-
